@@ -14,14 +14,12 @@ if [ $(id -u) -ne 0 ]; then
     exit 1
 fi
 
-# prepare dir and copy stuff in place
-mkdir $ROOT
-mkdir $ROOT/snappy
-
 # FIXME: confinement will prevent this
-# FIXME2: show progress(?)
 echo "Creating classic environment"
-cp -ar /snap/ubuntu-core/current/* $ROOT
+VERSION="$(/bin/readlink /snap/ubuntu-core/current)"
+SNAPROOT="/var/lib/snapd/snaps/ubuntu-core_${VERSION}.snap"
+/usr/bin/unsquashfs -d $ROOT $SNAPROOT
+mkdir $ROOT/snappy
 
 # enable
 sudo chroot $ROOT /var/lib/classic/enable.sh

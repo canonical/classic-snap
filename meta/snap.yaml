@@ -1,0 +1,10 @@
+name: classic
+version: 16.04-3
+confinement: devmode
+apps:
+  create:
+    command: bin/create
+  reset:
+    command: bin/reset
+  shell:
+    command: bin/shell

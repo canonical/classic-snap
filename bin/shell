@@ -39,7 +39,6 @@ do_bindmount /run /run
 do_bindmount /proc /proc
 do_bindmount /sys /sys
 do_bindmount /dev /dev
-do_bindmount /dev/pts /dev/pts
 do_bindmount / /snappy
 
 if [ -z "$SUDO_USER" ]; then
@@ -47,9 +46,7 @@ if [ -z "$SUDO_USER" ]; then
     SUDO_USER=root
 fi
 
-systemd-run --quiet --scope --unit=classic.scope --description="Classic shell" chroot "$ROOT" sudo debian_chroot="classic" -u $SUDO_USER -i
+systemd-run --quiet --scope --unit=classic.scope --description="Classic shell" chroot "$ROOT" sh -c "mount -o mode=666,ptmxmode=666 -t devpts devpts /dev/pts; script --quiet --return --command \"sudo debian_chroot=classic -u ${SUDO_USER} -i\" /dev/null"
+
 # kill leftover processes after exiting, if it's still around
 systemctl stop snappy-classic.scope 2>/dev/null || true
-
-
-

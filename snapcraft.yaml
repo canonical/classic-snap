@@ -1,7 +1,7 @@
 name: classic
 summary: A classic shell environment for Ubuntu Core all-snap installations
 description: This snap provides a full classic shell environment including dpkg and apt support.
-version: 16.04-4
+version: 16.04
 confinement: devmode
 architectures: [ all ]
 
@@ -10,7 +10,7 @@ apps:
     command: bin/create
   reset:
     command: bin/reset
-  shell:
+  classic:
     command: bin/shell
 
 parts:

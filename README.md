@@ -8,12 +8,10 @@ are just a simple `apt install strace` away.
 
 ## How to use it
 
-The snap needs to be installed and the classic environment must be
-enabled. Run the following commands on an all-snap image:
+Run the following commands on an all-snap image:
 
     $ sudo snap install --beta --devmode classic
-    $ sudo classic.create
-    $ sudo classic.shell
+    $ sudo classic
     (classic)ubuntu@localhost:~$ sudo apt update
     ...
     (classic)ubuntu@localhost:~$ exit
@@ -29,8 +27,5 @@ background binaries will exit when the classic dimension is closed.
 
 ## Future
 
-Once we have hook support for snaps, the `sudo classic.create` step
-will happen automatically on install.
-
 We also plan to have a generic `snap shell` feature, once that lands
-`sudo classic.shell` will be replaced with `snap shell classic`.
+`sudo classic` will be replaced with `snap shell classic`.

@@ -29,8 +29,7 @@ if [ "$(id -u)" != "0" ]; then
 fi 
 
 if [ ! -d $ROOT ]; then
-    echo "classic not created, please run 'classic.create'"
-    exit 1
+    classic.create
 fi
 
 # FIXME: confinement will prevent this
@@ -46,7 +45,14 @@ if [ -z "$SUDO_USER" ]; then
     SUDO_USER=root
 fi
 
-systemd-run --quiet --scope --unit=classic.scope --description="Classic shell" chroot "$ROOT" sh -c "mount -o mode=666,ptmxmode=666 -t devpts devpts /dev/pts; script --quiet --return --command \"sudo debian_chroot=classic -u ${SUDO_USER} -i\" /dev/null"
+# assemble command line
+DEVPTS="mount -o mode=666,ptmxmode=666 -t devpts devpts /dev/pts"
+SUDOCMD="sudo debian_chroot=classic -u ${SUDO_USER} -i"
+SCRIPT="script --quiet --return --command \"$SUDOCMD\" /dev/null"
+
+CMD="$DEVPTS; $SCRIPT"
+
+systemd-run --quiet --scope --unit=classic.scope --description="Classic shell" chroot "$ROOT" sh -c "$CMD"
 
 # kill leftover processes after exiting, if it's still around
-systemctl stop snappy-classic.scope 2>/dev/null || true
+systemctl stop classic.scope 2>/dev/null || true

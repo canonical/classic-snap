@@ -45,6 +45,9 @@ if [ -z "$SUDO_USER" ]; then
     SUDO_USER=root
 fi
 
+# fix LP: #1619455
+cp -a /var/lib/extrausers/* $ROOT/var/lib/extrausers/
+
 # assemble command line
 DEVPTS="mount -o mode=666,ptmxmode=666 -t devpts devpts /dev/pts"
 SUDOCMD="sudo debian_chroot=classic -u ${SUDO_USER} -i"

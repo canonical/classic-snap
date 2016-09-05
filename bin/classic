@@ -47,6 +47,7 @@ fi
 
 # fix LP: #1619455
 cp -a /var/lib/extrausers/* $ROOT/var/lib/extrausers/
+cp -a /etc/sudoers.d/* $ROOT/etc/sudoers.d/
 
 # assemble command line
 DEVPTS="mount -o mode=666,ptmxmode=666 -t devpts devpts /dev/pts"

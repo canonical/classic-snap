@@ -57,7 +57,7 @@ SCRIPT="script --quiet --return --command \"$SUDOCMD\" /dev/null"
 
 CMD="$DEVPTS; $SCRIPT"
 
-systemd-run --quiet --scope --unit=classic.scope --description="Classic shell" chroot "$ROOT" sh -c "$CMD"
+systemd-run --quiet --scope --unit=classic-$$.scope --description="Classic shell" chroot "$ROOT" sh -c "$CMD"
 
 # kill leftover processes after exiting, if it's still around
-systemctl stop classic.scope 2>/dev/null || true
+systemctl stop classic-$$.scope 2>/dev/null || true

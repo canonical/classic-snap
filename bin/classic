@@ -52,6 +52,7 @@ cp -a /etc/sudoers.d/* $ROOT/etc/sudoers.d/
 # assemble command line
 DEVPTS="mount -o mode=666,ptmxmode=666 -t devpts devpts /dev/pts"
 SUDOCMD="sudo debian_chroot=classic -u ${SUDO_USER} -i $@"
+# FIXME: workaround for https://bugs.launchpad.net/snappy/+bug/1611493
 SCRIPT="script --quiet --return --command \"$SUDOCMD\" /dev/null"
 
 CMD="$DEVPTS; $SCRIPT"

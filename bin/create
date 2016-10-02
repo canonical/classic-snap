@@ -14,10 +14,20 @@ if [ $(id -u) -ne 0 ]; then
     exit 1
 fi
 
+CORE=""
+if [ -e /snap/core/current ]; then
+    CORE="core"
+elif [ -e /snap/ubuntu-core/current ]; then
+    CORE="ubuntu-core"
+else
+    echo "Cannot find core snap"
+    exit 1
+fi
+
 # FIXME: confinement will prevent this
 echo "Creating classic environment"
-VERSION="$(/bin/readlink /snap/ubuntu-core/current)"
-SNAPROOT="/var/lib/snapd/snaps/ubuntu-core_${VERSION}.snap"
+VERSION="$(/bin/readlink /snap/${CORE}/current)"
+SNAPROOT="/var/lib/snapd/snaps/${CORE}_${VERSION}.snap"
 /usr/bin/unsquashfs -d $ROOT $SNAPROOT
 mkdir $ROOT/snappy
 

@@ -29,7 +29,10 @@ if [ "$(id -u)" != "0" ]; then
 fi 
 
 if [ ! -d $ROOT ]; then
-    classic.create
+    # IMPORTANT: do not run the classic.create as this will run it with
+    #            snap-confine again and this will cause havoc with current
+    #            snap-confine
+    $SNAP/bin/create
 fi
 
 # FIXME: confinement will prevent this

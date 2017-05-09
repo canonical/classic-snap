@@ -8,14 +8,15 @@ architectures: [ all ]
 apps:
   create:
     command: bin/create
+    plugs: [classic-support]
   reset:
     command: bin/reset
+    plugs: [classic-support]
   classic:
     command: bin/classic
+    plugs: [classic-support]
 
 parts:
   copy:
     plugin: dump
     source: .
-    filesets:
-      bin/*: bin

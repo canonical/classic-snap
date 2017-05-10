@@ -4,18 +4,21 @@ description: This snap provides a full classic shell environment including dpkg 
 version: 16.04
 confinement: devmode
 architectures: [ all ]
+grade: devel
+assumes: [snapd2.23]
 
 apps:
   create:
     command: bin/create
+    plugs: [classic-support]
   reset:
     command: bin/reset
+    plugs: [classic-support]
   classic:
     command: bin/classic
+    plugs: [classic-support]
 
 parts:
   copy:
     plugin: dump
     source: .
-    filesets:
-      bin/*: bin

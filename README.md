@@ -13,6 +13,7 @@ Run the following commands on an all-snap image:
     $ sudo snap install --beta --devmode classic
     $ sudo classic
     ...
+    (classic)ubuntu@localhost:~$ sudo apt update
     (classic)ubuntu@localhost:~$ exit
     $
 

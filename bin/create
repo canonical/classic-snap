@@ -31,8 +31,12 @@ SNAPROOT="/var/lib/snapd/snaps/${CORE}_${VERSION}.snap"
 /usr/bin/unsquashfs -d $ROOT $SNAPROOT
 mkdir $ROOT/snappy
 
-# enable
+# call the enable.sh script and make sure we have
+# DNS resolution available (needed by apt update)
+mkdir -p $ROOT/run/resolvconf
+cp /run/resolvconf/resolv.conf $ROOT/run/resolvconf/
 sudo chroot $ROOT /var/lib/classic/enable.sh
+rm -rf $ROOT/run/resolvconf
 
 # copy important config
 for f in hostname timezone localtime; do

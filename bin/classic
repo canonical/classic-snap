@@ -58,7 +58,7 @@ SUDOCMD="sudo debian_chroot=classic -u ${SUDO_USER} -i $@"
 # FIXME: workaround for https://bugs.launchpad.net/snappy/+bug/1611493
 SCRIPT="script --quiet --return --command \"$SUDOCMD\" /dev/null"
 
-CMD="$DEVPTS; $SCRIPT"
+CMD="$DEVPTS; $SCRIPT && umount /dev/pts"
 
 systemd-run --quiet --scope --unit=classic-$$.scope --description="Classic shell" chroot "$ROOT" sh -c "$CMD"
 

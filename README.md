@@ -30,3 +30,11 @@ background binaries will exit when the classic dimension is closed.
 
 We also plan to have a generic `snap shell` feature, once that lands
 `sudo classic` will be replaced with `snap shell classic`.
+
+## Auto Builds
+
+This branch is automatically mirrored into the https://launchpad.net/classic-snap project to the https://code.launchpad.net/~snappy-dev/classic-snap/+git/classic-snap/+ref/master tree.
+
+Automatic snap builds and uploads to the edge channel happen for every commit in the master branch at https://code.launchpad.net/~snappy-dev/+snap/classic 
+
+If you made a commit, please test the resulting snap package from edge and make sure it gets promoted to the beta channel after a successful test run.

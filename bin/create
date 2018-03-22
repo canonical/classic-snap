@@ -63,3 +63,6 @@ chmod 755 "$ROOT/usr/sbin/policy-rc.d"
 
 # workaround bug in livecd-rootfs
 chmod 1777 "$ROOT/tmp"
+
+# avoid command-not-found breaking on missing file
+cp /var/cache/snapd/commands.db "$ROOT/var/cache/snapd/"

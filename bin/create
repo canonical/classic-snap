@@ -15,11 +15,16 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 CORE=""
-if [ -e /snap/core/current ]; then
+if grep -q "Ubuntu Core 18" /etc/os-release; then
+    CORE="core18"
+elif grep -q "Ubuntu Core 16" /etc/os-release; then
     CORE="core"
-elif [ -e /snap/ubuntu-core/current ]; then
-    CORE="ubuntu-core"
 else
+    echo "Classic mode only works on Ubuntu Core"
+    exit 1
+fi
+
+if [ ! -e /snap/${CORE}/current ]; then
     echo "Cannot find core snap"
     exit 1
 fi

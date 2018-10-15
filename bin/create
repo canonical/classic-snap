@@ -46,6 +46,8 @@ for f in hosts; do
     cp -a /etc/$f $ROOT/etc/
 done
 
+# create /etc/alternatives for now
+mkdir -p $ROOT/etc/alternatives
 
 # don't start services in the chroot on apt-get install
 cat <<EOF > "$ROOT/usr/sbin/policy-rc.d"

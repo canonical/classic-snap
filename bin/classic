@@ -42,6 +42,7 @@ do_bindmount /proc /proc
 do_bindmount /sys /sys
 do_bindmount /dev /dev
 do_bindmount / /snappy
+do_bindmount /etc/sudoers  $ROOT/etc/sudoers
 
 if [ -z "$SUDO_USER" ]; then
     echo "Cannot determine calling user, logging into classic as root"

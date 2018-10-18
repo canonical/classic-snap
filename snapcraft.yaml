@@ -25,9 +25,16 @@ apps:
     adapter: none
 
 parts:
+  check:
+    plugin: nil
+    override-build: |
+      shellcheck ./bin/*
+    build-packages:
+      - shellcheck
   copy:
     plugin: dump
     source: .
+    after: [check]
   base:
     plugin: nil
     override-build: |
@@ -35,3 +42,4 @@ parts:
       (cd $SNAPCRAFT_PART_INSTALL && ln -s bionic-base-$(dpkg --print-architecture).tar.gz bionic-base.tar.gz)
     stage:
       - ./bionic-base*.tar.gz
+    after: [check]

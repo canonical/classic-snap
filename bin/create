@@ -4,12 +4,12 @@ set -eu
 
 ROOT=$SNAP_COMMON/classic
 
-if [ -d $ROOT ]; then
+if [ -d "$ROOT" ]; then
     echo "classic already enabled"
     exit 1
 fi
 
-if [ $(id -u) -ne 0 ]; then
+if [ "$(id -u)" -ne "0" ]; then
     echo "This script needs to be called as root" >&2
     exit 1
 fi
@@ -22,32 +22,32 @@ if ! grep -q "ID=ubuntu-core" /etc/os-release; then
 fi
 
 echo "Creating classic environment"
-mkdir -p $ROOT
-tar -x -f $SNAP/bionic-base.tar.gz -C $ROOT
-mkdir -p $ROOT/snappy
+mkdir -p "$ROOT"
+tar -x -f "$SNAP"/bionic-base.tar.gz -C "$ROOT"
+mkdir -p "$ROOT"/snappy
 
 # DNS resolution available (needed by apt update)
-cp /etc/resolv.conf $ROOT/etc/
-cat > $ROOT/etc/apt/apt.conf.d/00-no-pr-set-new-privs.conf <<EOF
+cp /etc/resolv.conf "$ROOT"/etc/
+cat > "$ROOT"/etc/apt/apt.conf.d/00-no-pr-set-new-privs.conf <<EOF
 // "snap run" will apply a seccomp sandbox in "complain" mode.
 // Then apt will call "prctl(PR_SET_NO_NEW_PRIVS)" in the methods
 // which will result in execve() for apt-key to fail. Workaround
 // by disabling the sandbox in apt.
 Debug::NoDropPrivs "1";
 EOF
-chroot $ROOT apt install -y sudo libnss-extrausers vim.tiny
+chroot "$ROOT" apt install -y sudo libnss-extrausers vim.tiny
 
 
 # copy important config
 for f in hostname timezone localtime; do
-    cp -a /etc/writable/$f $ROOT/etc
+    cp -a /etc/writable/"$f" "$ROOT"/etc
 done
 for f in resolv.conf nsswitch.conf hosts; do
-    cp -a /etc/$f $ROOT/etc
+    cp -a /etc/"$f" "$ROOT"/etc
 done
 
 # create /etc/alternatives for now
-mkdir -p $ROOT/etc/alternatives
+mkdir -p "$ROOT"/etc/alternatives
 
 # don't start services in the chroot on apt-get install
 cat <<EOF > "$ROOT/usr/sbin/policy-rc.d"

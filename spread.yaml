@@ -26,3 +26,6 @@ suites:
       snapcraft
       echo "Install snap"
       snap install --dangerous --devmode classic_*.snap
+    restore: |
+      echo "Ensure snapd and all snaps are gone"
+      apt autoremove -y --purge snapd snapcraft

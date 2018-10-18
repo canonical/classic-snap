@@ -51,6 +51,12 @@ fi
 # fix LP: #1619455
 cp -a /var/lib/extrausers/* "$ROOT"/var/lib/extrausers/
 cp -a /etc/sudoers.d/* "$ROOT"/etc/sudoers.d/
+# this is only needed when this is run on classic
+if ! grep -q ^"${SUDO_USER}" "$ROOT"/var/lib/extrausers/passwd && ! grep -q "^${SUDO_USER}" "$ROOT"/etc/passwd; then
+    grep "^${SUDO_USER}" /etc/passwd >> "$ROOT"/etc/passwd
+    grep "^${SUDO_USER}" /etc/shadow >> "$ROOT"/etc/shadow
+    echo "${SUDO_USER} ALL=(ALL) NOPASSWD:ALL" > "$ROOT/etc/sudoers.d/${SUDO_USER}"
+fi
 
 # assemble command line
 DEVPTS="mount -o mode=666,ptmxmode=666 -t devpts devpts /dev/pts"

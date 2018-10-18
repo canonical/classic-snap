@@ -1,5 +1,9 @@
 summary: Check that the classic snap works
 
+restore: |
+    echo "Ensure cleanup even if the test fails"
+    classic.reset || true
+
 execute: |
     echo "Ensure create works"
     classic.create

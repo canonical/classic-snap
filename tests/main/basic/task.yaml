@@ -1,6 +1,26 @@
 summary: Check that the classic snap works
 
 execute: |
+    echo "Ensure create works"
     classic.create
-    classic cat /etc/os-release | MATCH '^ID=ubuntu'
+    if classic cat /etc/os-release | grep -E "ID=ubuntu-core"; then
+        echo "classic environment has unexpected ID=ubuntu-core"
+        exit 1
+    fi
+
+    echo "Ensure installing of stuff works"
+    classic apt update
+    classic apt install -y mc
+    [ -x /var/snap/classic/common/classic/usr/bin/mc ]
+
+    echo "Ensure daemons are not started"
+    [ -x /var/snap/classic/common/classic/usr/sbin/policy-rc.d ]
+    classic apt install -y apache2
+    if echo "GET / HTTP/1.0\n\n" | nc localhost 80; then
+        echo "apache is now listening on localhost - this should not happen"
+        exit 1
+    fi
+    
+    echo "Ensure reset works"
     classic.reset
+    [ ! -d /var/snap/classic/common/classic ]

@@ -1,0 +1,6 @@
+summary: Check that the classic snap works
+
+execute: |
+    classic.create
+    classic cat /etc/os-release | MATCH '^ID=ubuntu'
+    classic.reset

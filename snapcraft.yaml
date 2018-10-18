@@ -1,24 +1,37 @@
 name: classic
-summary: A classic shell environment for Ubuntu Core all-snap installations
-description: This snap provides a full classic shell environment including dpkg and apt support.
-version: 16.04
+summary: A classic shell environment for Ubuntu Core installations
+description: |
+  This snap provides a full classic shell environment including dpkg and
+  apt support.
+version: 18.04-0.1
 confinement: devmode
-architectures: [ all ]
 grade: devel
-assumes: [snapd2.23]
+base: core18
 
+# All apps are created without a wrapper script (adapter: none) because
+# they are just simple shell scripts, no need for wrappers.
 apps:
   create:
     command: bin/create
     plugs: [classic-support]
+    adapter: none
   reset:
     command: bin/reset
     plugs: [classic-support]
+    adapter: none
   classic:
     command: bin/classic
     plugs: [classic-support]
+    adapter: none
 
 parts:
   copy:
     plugin: dump
     source: .
+  base:
+    plugin: nil
+    override-build: |
+      wget -P $SNAPCRAFT_PART_INSTALL http://cdimage.ubuntu.com/ubuntu-base/bionic/daily/current/bionic-base-$(dpkg --print-architecture).tar.gz
+      (cd $SNAPCRAFT_PART_INSTALL && ln -s bionic-base-$(dpkg --print-architecture).tar.gz bionic-base.tar.gz)
+    stage:
+      - ./bionic-base*.tar.gz

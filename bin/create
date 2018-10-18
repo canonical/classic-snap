@@ -14,36 +14,36 @@ if [ $(id -u) -ne 0 ]; then
     exit 1
 fi
 
-CORE=""
-if [ -e /snap/core/current ]; then
-    CORE="core"
-elif [ -e /snap/ubuntu-core/current ]; then
-    CORE="ubuntu-core"
-else
-    echo "Cannot find core snap"
+# FIXME: We really should ensure this also works on
+#        classic, it is an easy way to get a chroot there
+if ! grep -q "ID=ubuntu-core" /etc/os-release; then
+    echo "Classic mode only works on Ubuntu Core"
     exit 1
 fi
 
-# FIXME: confinement will prevent this
 echo "Creating classic environment"
-VERSION="$(/bin/readlink /snap/${CORE}/current)"
-SNAPROOT="/var/lib/snapd/snaps/${CORE}_${VERSION}.snap"
-/usr/bin/unsquashfs -d $ROOT $SNAPROOT
-mkdir $ROOT/snappy
+mkdir -p $ROOT
+tar -x -f $SNAP/bionic-base.tar.gz -C $ROOT
+mkdir -p $ROOT/snappy
 
-# call the enable.sh script and make sure we have
 # DNS resolution available (needed by apt update)
-mkdir -p $ROOT/run/resolvconf
-cp /run/resolvconf/resolv.conf $ROOT/run/resolvconf/
-sudo chroot $ROOT /var/lib/classic/enable.sh
-rm -rf $ROOT/run/resolvconf
+cp /etc/resolv.conf $ROOT/etc/
+cat > $ROOT/etc/apt/apt.conf.d/00-no-pr-set-new-privs.conf <<EOF
+// "snap run" will apply a seccomp sandbox in "complain" mode.
+// Then apt will call "prctl(PR_SET_NO_NEW_PRIVS)" in the methods
+// which will result in execve() for apt-key to fail. Workaround
+// by disabling the sandbox in apt.
+Debug::NoDropPrivs "1";
+EOF
+chroot $ROOT apt install -y sudo libnss-extrausers vim.tiny
+
 
 # copy important config
 for f in hostname timezone localtime; do
-    cp -a /etc/writable/$f $ROOT/etc/writable
+    cp -a /etc/writable/$f $ROOT/etc
 done
-for f in hosts; do
-    cp -a /etc/$f $ROOT/etc/
+for f in resolv.conf nsswitch.conf hosts; do
+    cp -a /etc/$f $ROOT/etc
 done
 
 # create /etc/alternatives for now

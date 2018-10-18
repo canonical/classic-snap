@@ -30,6 +30,8 @@ parts:
     source: .
   base:
     plugin: nil
+    build-packages:
+      - wget
     override-build: |
       wget -P $SNAPCRAFT_PART_INSTALL http://cdimage.ubuntu.com/ubuntu-base/bionic/daily/current/bionic-base-$(dpkg --print-architecture).tar.gz
       (cd $SNAPCRAFT_PART_INSTALL && ln -s bionic-base-$(dpkg --print-architecture).tar.gz bionic-base.tar.gz)

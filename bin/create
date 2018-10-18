@@ -14,11 +14,6 @@ if [ $(id -u) -ne 0 ]; then
     exit 1
 fi
 
-if ! grep -q 'ID=ubuntu-core' /etc/os-release; then
-    echo "Classic mode only works on Ubuntu Core"
-    exit 1
-fi
-
 CORE=""
 if [ -e /snap/core/current ]; then
     CORE="core"
@@ -54,15 +49,8 @@ sudo chroot $ROOT /var/lib/classic/enable.sh
 mv $ROOT/etc/resolv.conf.save $ROOT/etc/resolv.conf
 
 # copy important config
-for f in hostname timezone localtime; do
-    if [ -e /etc/writable/$f ]; then
-        cp -a /etc/writable/$f $ROOT/etc/writable
-    elif [ -e /etc/$f ]; then
-        cp -a /etc/$f $ROOT/writable/etc
-    fi
-done
-for f in hosts; do
-    cp -a /etc/$f $ROOT/etc/
+for f in hostname timezone localtime hosts resolv.conf; do
+    cp -aL --remove-destination /etc/$f $ROOT/etc
 done
 
 # create /etc/alternatives for now
@@ -86,7 +74,7 @@ chmod 755 "$ROOT/usr/sbin/policy-rc.d"
 chmod 1777 "$ROOT/tmp"
 
 # tell the user if classic does not match the ubuntu core release
-if ! grep -q 'VERSION_ID=\"16\"' /var/lib/snapd/hostfs/etc/os-release; then
+if grep -q "ID=ubuntu-core" /var/lib/snapd/hostfs/etc/os-release && ! grep -q 'VERSION_ID=\"16\"' /var/lib/snapd/hostfs/etc/os-release; then
     cat <<'EOF'
 This version of classic was build for Ubuntu Core 16. You appear to be using
 a different version of Ubuntu Core. You can install different versions of

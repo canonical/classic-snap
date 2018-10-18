@@ -4,8 +4,7 @@ set -eu
 
 ROOT=$SNAP_COMMON/classic
 
-# check for the last bit that got created
-if [ -x $ROOT/usr/sbin/policy-rc.d ]; then
+if [ -d $ROOT ]; then
     echo "classic already enabled"
     exit 1
 fi
@@ -16,15 +15,15 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 # FIXME: We really should ensure this also works on
-#        classic, its an easy way to get a chroot there
-if ! grep -q "Ubuntu Core" /etc/os-release; then
+#        classic, it is an easy way to get a chroot there
+if ! grep -q "ID=ubuntu-core" /etc/os-release; then
     echo "Classic mode only works on Ubuntu Core"
     exit 1
 fi
 
 echo "Creating classic environment"
 mkdir -p $ROOT
-tar -x -f $SNAP/bionic-base-*.tar.gz -C $ROOT
+tar -x -f $SNAP/bionic-base.tar.gz -C $ROOT
 mkdir -p $ROOT/snappy
 
 # DNS resolution available (needed by apt update)

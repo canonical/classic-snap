@@ -5,7 +5,7 @@ set -eu
 ROOT=$SNAP_COMMON/classic
 
 if [ -d $ROOT ]; then
-    echo "classic already enabled"
+    echo "classic already enabled, use classic.reset to remove it again"
     exit 1
 fi
 
@@ -34,16 +34,23 @@ mkdir $ROOT/snappy
 # call the enable.sh script and make sure we have
 # DNS resolution available (needed by apt update)
 mkdir -p $ROOT/run/resolvconf
-cp /run/resolvconf/resolv.conf $ROOT/run/resolvconf/
+mv $ROOT/etc/resolv.conf $ROOT/etc/resolv.conf.save
+cp /etc/resolv.conf $ROOT/etc
+# make apt work inside the chroot in UC18
+cat > $ROOT/etc/apt/apt.conf.d/00-no-pr-set-new-privs.conf <<EOF
+// "snap run" will apply a seccomp sandbox in "complain" mode.
+// Then apt will call "prctl(PR_SET_NO_NEW_PRIVS)" in the methods
+// which will result in execve() for apt-key to fail. Workaround
+// by disabling the sandbox in apt.
+Debug::NoDropPrivs "1";
+EOF
+# now call enable from inside the core
 sudo chroot $ROOT /var/lib/classic/enable.sh
-rm -rf $ROOT/run/resolvconf
+mv $ROOT/etc/resolv.conf.save $ROOT/etc/resolv.conf
 
 # copy important config
-for f in hostname timezone localtime; do
-    cp -a /etc/writable/$f $ROOT/etc/writable
-done
-for f in hosts; do
-    cp -a /etc/$f $ROOT/etc/
+for f in hostname timezone localtime hosts resolv.conf; do
+    cp -aL --remove-destination /etc/$f $ROOT/etc
 done
 
 # create /etc/alternatives for now
@@ -65,3 +72,16 @@ chmod 755 "$ROOT/usr/sbin/policy-rc.d"
 
 # workaround bug in livecd-rootfs
 chmod 1777 "$ROOT/tmp"
+
+# tell the user if classic does not match the ubuntu core release
+if grep -q "ID=ubuntu-core" /var/lib/snapd/hostfs/etc/os-release && ! grep -q 'VERSION_ID=\"16\"' /var/lib/snapd/hostfs/etc/os-release; then
+    cat <<'EOF'
+This version of classic was build for Ubuntu Core 16. You appear to be using
+a different version of Ubuntu Core. You can install different versions of
+the classic environment, e.g. for Ubuntu Core 18:
+
+    sudo snap install --channel=18 classic
+
+EOF
+fi
+

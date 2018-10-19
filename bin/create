@@ -40,7 +40,9 @@ chroot $ROOT apt install -y sudo libnss-extrausers vim.tiny
 
 # copy important config
 for f in hostname timezone localtime; do
-    cp -aL /etc/$f $ROOT/etc
+    if [ -e /etc/$f ]; then
+        cp -aL /etc/$f $ROOT/etc
+    fi
 done
 for f in resolv.conf nsswitch.conf hosts; do
     cp -a /etc/$f $ROOT/etc

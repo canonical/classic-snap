@@ -11,21 +11,40 @@ backends:
       - ubuntu-18.04-64:
           username: ubuntu
           password: ubuntu
+      # create this image from
+      # http://cdimage.ubuntu.com/ubuntu-core/16/stable/current/ubuntu-core-16-amd64.img.xz
+      # Boot with: "kvm -m 1500 -redir tcp:10022::22 ubuntu-core-16-64-amd64.img"
+      # create ssh user, login via ssh and then:
+      # $ sudo adduser --extrausers ubuntu
+      # $ echo "ubuntu ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ubuntu
+      # $ sync
+      - ubuntu-core-16-64:
+          username: ubuntu
+          password: ubuntu
+      - ubuntu-core-18-64:
+          username: ubuntu
+          password: ubuntu
 
 suites:
   tests/main/:
     summary: Integration test for the classic snap
     prepare: |
-      echo "Prepare image"
-      apt update
-      apt install -y snapd snapcraft
-      snap install core
-      echo "Build snap"
-      cd $SPREAD_PATH
-      snapcraft clean
-      snapcraft
+      # FIXME: classic does not pass environment so workaround here
+      echo $SPREAD_PATH > /run/SPREAD_PATH
+      if [ ! -f /var/lib/dpkg/status ]; then
+          # ubuntu-core (we need classic first to build classic)
+          when="$(date --iso-8601=seconds -d 'tomorrow 8:05 UTC')"
+          snap set core refresh.hold="$when"
+          snap install classic --devmode --edge
+          classic $SPREAD_PATH/tests/lib/build.sh
+          snap remove classic
+      else
+          $SPREAD_PATH/tests/lib/build.sh
+      fi
       echo "Install snap"
-      snap install --dangerous --devmode classic_*.snap
+      snap install --dangerous --devmode $SPREAD_PATH/classic_*.snap
     restore: |
       echo "Ensure snapd and all snaps are gone"
-      apt autoremove -y --purge snapd snapcraft
+      if [ -f /var/lib/dpkg/status ]; then
+          apt autoremove -y --purge snapd snapcraft
+      fi

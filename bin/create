@@ -50,7 +50,9 @@ mv $ROOT/etc/resolv.conf.save $ROOT/etc/resolv.conf
 
 # copy important config
 for f in hostname timezone localtime hosts resolv.conf; do
-    cp -aL --remove-destination /etc/$f $ROOT/etc
+    if [ -e /etc/$f ]; then
+        cp -aL --remove-destination /etc/$f $ROOT/etc
+    fi
 done
 
 # create /etc/alternatives for now

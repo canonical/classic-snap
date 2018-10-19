@@ -1,0 +1,31 @@
+project: classic-snap
+
+path: /home/spread
+
+backends:
+  qemu:
+    systems:
+      - ubuntu-16.04-64:
+          username: ubuntu
+          password: ubuntu
+      - ubuntu-18.04-64:
+          username: ubuntu
+          password: ubuntu
+
+suites:
+  tests/main/:
+    summary: Integration test for the classic snap
+    prepare: |
+      echo "Prepare image"
+      apt update
+      apt install -y snapd snapcraft
+      snap install core
+      echo "Build snap"
+      cd $SPREAD_PATH
+      snapcraft clean
+      snapcraft
+      echo "Install snap"
+      snap install --dangerous --devmode classic_*.snap
+    restore: |
+      echo "Ensure snapd and all snaps are gone"
+      apt autoremove -y --purge snapd snapcraft

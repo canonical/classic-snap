@@ -2,14 +2,14 @@
 
 set -eu
 
-ROOT=$SNAP_COMMON/classic
+ROOT="$SNAP_COMMON"/classic
 
-if [ -d $ROOT ]; then
+if [ -d "$ROOT" ]; then
     echo "classic already enabled, use classic.reset to remove it again"
     exit 1
 fi
 
-if [ $(id -u) -ne 0 ]; then
+if [ "$(id -u)" -ne "0" ]; then
     echo "This script needs to be called as root" >&2
     exit 1
 fi
@@ -28,16 +28,16 @@ fi
 echo "Creating classic environment"
 VERSION="$(/bin/readlink /snap/${CORE}/current)"
 SNAPROOT="/var/lib/snapd/snaps/${CORE}_${VERSION}.snap"
-/usr/bin/unsquashfs -d $ROOT $SNAPROOT
-mkdir $ROOT/snappy
+/usr/bin/unsquashfs -d "$ROOT" "$SNAPROOT"
+mkdir "$ROOT"/snappy
 
 # call the enable.sh script and make sure we have
 # DNS resolution available (needed by apt update)
-mkdir -p $ROOT/run/resolvconf
-mv $ROOT/etc/resolv.conf $ROOT/etc/resolv.conf.save
-cp /etc/resolv.conf $ROOT/etc
+mkdir -p "$ROOT"/run/resolvconf
+mv "$ROOT"/etc/resolv.conf "$ROOT"/etc/resolv.conf.save
+cp /etc/resolv.conf "$ROOT"/etc
 # make apt work inside the chroot in UC18
-cat > $ROOT/etc/apt/apt.conf.d/00-no-pr-set-new-privs.conf <<EOF
+cat > "$ROOT"/etc/apt/apt.conf.d/00-no-pr-set-new-privs.conf <<EOF
 // "snap run" will apply a seccomp sandbox in "complain" mode.
 // Then apt will call "prctl(PR_SET_NO_NEW_PRIVS)" in the methods
 // which will result in execve() for apt-key to fail. Workaround
@@ -45,16 +45,16 @@ cat > $ROOT/etc/apt/apt.conf.d/00-no-pr-set-new-privs.conf <<EOF
 Debug::NoDropPrivs "1";
 EOF
 # now call enable from inside the core
-sudo chroot $ROOT /var/lib/classic/enable.sh
-mv $ROOT/etc/resolv.conf.save $ROOT/etc/resolv.conf
+sudo chroot "$ROOT" /var/lib/classic/enable.sh
+mv "$ROOT"/etc/resolv.conf.save "$ROOT"/etc/resolv.conf
 
 # copy important config
 for f in hostname timezone localtime hosts resolv.conf; do
-    cp -aL --remove-destination /etc/$f $ROOT/etc
+    cp -aL --remove-destination /etc/"$f" "$ROOT"/etc
 done
 
 # create /etc/alternatives for now
-mkdir -p $ROOT/etc/alternatives
+mkdir -p "$ROOT"/etc/alternatives
 
 # don't start services in the chroot on apt-get install
 cat <<EOF > "$ROOT/usr/sbin/policy-rc.d"

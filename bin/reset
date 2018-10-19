@@ -2,7 +2,7 @@
 
 set -eu
 
-ROOT=$SNAP_COMMON/classic
+ROOT="$SNAP_COMMON"/classic
 
 if [ "$(id -u)" != "0" ]; then
     echo "needs to run as root"
@@ -16,4 +16,4 @@ for d in /home /run /proc /sys /dev /var/lib/extrausers /etc/sudoers /etc/sudoer
 done
 
 # cleanup
-rm -rf $ROOT
+rm -rf "$ROOT"

@@ -2,7 +2,7 @@
 
 set -e
 
-ROOT=$SNAP_COMMON/classic
+ROOT="$SNAP_COMMON"/classic
 
 # $1: source
 # $2: target
@@ -13,7 +13,7 @@ ROOT=$SNAP_COMMON/classic
 # developing/debugging the snappy host
 do_bindmount() {
     if ! mountpoint -q "$ROOT/$2"; then
-        if [ -d "$1" -a ! -L "$1" ]; then
+        if [ -d "$1" ] && [ ! -L "$1" ]; then
             mkdir -p "$ROOT/$2"
         fi
         mount --make-rprivate --rbind -o rbind "$1" "$ROOT/$2"
@@ -28,11 +28,11 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi 
 
-if [ ! -d $ROOT ]; then
+if [ ! -d "$ROOT" ]; then
     # IMPORTANT: do not run the classic.create as this will run it with
     #            snap-confine again and this will cause havoc with current
     #            snap-confine
-    $SNAP/bin/create
+    "$SNAP"/bin/create
 fi
 
 # FIXME: confinement will prevent this
@@ -49,18 +49,18 @@ if [ -z "$SUDO_USER" ]; then
 fi
 
 # fix LP: #1619455
-cp -a /var/lib/extrausers/* $ROOT/var/lib/extrausers/
-cp -a /etc/sudoers.d/* $ROOT/etc/sudoers.d/
+cp -a /var/lib/extrausers/* "$ROOT"/var/lib/extrausers/
+cp -a /etc/sudoers.d/* "$ROOT"/etc/sudoers.d/
 # this is only needed when this is run on classic
-if ! grep -q ^${SUDO_USER} $ROOT/var/lib/extrausers/passwd && ! grep -q ^${SUDO_USER} $ROOT/etc/passwd; then
-    grep ^${SUDO_USER} /etc/passwd >> $ROOT/etc/passwd
-    grep ^${SUDO_USER} /etc/shadow >> $ROOT/etc/shadow
-    echo "${SUDO_USER} ALL=(ALL) NOPASSWD:ALL" > $ROOT/etc/sudoers.d/${SUDO_USER}
+if ! grep -q "^${SUDO_USER}" "$ROOT"/var/lib/extrausers/passwd && ! grep -q "^${SUDO_USER}" "$ROOT"/etc/passwd; then
+    grep "^${SUDO_USER}" /etc/passwd >> "$ROOT"/etc/passwd
+    grep "^${SUDO_USER}" /etc/shadow >> "$ROOT"/etc/shadow
+    echo "${SUDO_USER} ALL=(ALL) NOPASSWD:ALL" > "$ROOT/etc/sudoers.d/${SUDO_USER}"
 fi
 
 # assemble command line
 DEVPTS="mount -o mode=666,ptmxmode=666 -t devpts devpts /dev/pts"
-SUDOCMD="sudo debian_chroot=classic -u ${SUDO_USER} -i $@"
+SUDOCMD="sudo debian_chroot=classic -u ${SUDO_USER} -i $*"
 # FIXME: workaround for https://bugs.launchpad.net/snappy/+bug/1611493
 SCRIPT="script --quiet --return --command \"$SUDOCMD\" /dev/null"
 

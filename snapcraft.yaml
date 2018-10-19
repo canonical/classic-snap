@@ -19,6 +19,13 @@ apps:
     plugs: [classic-support]
 
 parts:
+  check:
+    plugin: nil
+    override-build: |
+      shellcheck ./bin/*
+    build-packages:
+      - shellcheck
   copy:
     plugin: dump
     source: .
+    after: [check]
